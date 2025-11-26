@@ -23,7 +23,7 @@ FetchContent_MakeAvailable(SFML)
 
 #file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 
-add_executable(main src/main.cpp ) 
+add_executable(main src/main.cpp src/chip8.cpp) 
 
 target_link_libraries(main PRIVATE SFML::Graphics)
 
