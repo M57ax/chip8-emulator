@@ -12,7 +12,11 @@ cd existing_repo
 git remote add origin http://SRV-SWE-GIT.atoma.local/schelske/chip-8.git
 git branch -M master
 git push -uf origin master
-```
+
+
+## helpful links (for me)
+std::ifstream:  https://en.cppreference.com/w/cpp/io/basic_ifstream.html
+Chip 8 instructions:    https://johnearnest.github.io/Octo/docs/chip8ref.pdf
 
 ## Integrate with your tools
 
