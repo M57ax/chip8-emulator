@@ -1,5 +1,8 @@
 #include "chip8.hpp"
+#include <cstdint>
+
 #include <iostream>
+#include <fstream>
 
 Chip8::Chip8() {
 
@@ -7,4 +10,51 @@ Chip8::Chip8() {
     m_pc = 0x200;
     m_delayTimer = 0;
     m_soundTimer = 0;
+
+//     const int FONTSET_START_ADDRESS = 0x50;
+//     const int FONTSET_SIZE = 80;
+
+
+//     uint8_t fontset[FONTSET_SIZE] =
+//     {
+// 	0xF0, 0x90, 0x90, 0x90, 0xF0,      // 0
+// 	0x20, 0x60, 0x20, 0x20, 0x70,      // 1
+// 	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+// 	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+// 	0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+// 	0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+// 	0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+// 	0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+// 	0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+// 	0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+// 	0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+// 	0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+// 	0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+// 	0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+// 	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+// 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+//     };
+
+}
+
+void Chip8::loadROM(const std::string& filePath) {
+    std::ifstream file(filePath, std::ios::binary);
+    if (file) {
+        file.read(&m_memory[m_pc], 4096 - 0x200);
+        std::cout << "ROM File successfully loaded" << std::endl;
+        return;
+    } else {
+
+        std::cout << "Error while opening ROM" << std::endl;
+        return; 
+    }
+}
+
+void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High und Low Byte werden kombiniert
+    m_opcode = (m_memory[m_pc] << 8) | m_memory[m_pc + 1]; 
+    m_pc += 2; // danach PC +2 hochzählen
+
+    //Decode wie n,nn,nnn,x,y,z einbauen
+    
+
 }

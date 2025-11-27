@@ -1,24 +1,28 @@
 #include <SFML/Graphics.hpp>
 #include "chip8.hpp"
 
+#include <iostream>
+
 
 int main()
 {
     constexpr int screenScale = 15;
     sf::RenderWindow window(sf::VideoMode({Chip8::screenWidth * screenScale , Chip8::screenWidth * screenScale}), "Chip-8 Emulator");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    Chip8 chip8;
+    chip8.loadROM("chip8-logo.ch8");
+    
 
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
         {
+
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
 
         window.clear();
-        window.draw(shape);
+        //window.draw();
         window.display();
     }
 }
