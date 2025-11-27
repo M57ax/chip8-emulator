@@ -49,12 +49,3 @@ void Chip8::loadROM(const std::string& filePath) {
         return; 
     }
 }
-
-void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High und Low Byte werden kombiniert
-    m_opcode = (m_memory[m_pc] << 8) | m_memory[m_pc + 1]; 
-    m_pc += 2; // danach PC +2 hochzählen
-
-    //Decode wie n,nn,nnn,x,y,z einbauen
-    
-
-}
