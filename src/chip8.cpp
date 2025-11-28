@@ -42,16 +42,17 @@ void Chip8::loadROM(const std::string& filePath) {
     if (file) {
         file.read(&m_memory[m_pc], 4096 - 0x200);
         std::cout << "ROM File successfully loaded" << std::endl;
-        return;
+        
     } else {
 
         std::cout << "Error while opening ROM" << std::endl;
-        return; 
+
     }
 }
 void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High und Low Byte werden kombiniert
     //High und Low werden zu einem opcode, der wird ausgeführt und der pc um 2 hochgezählt
     // danach werden die nächsten zwei Speicherblöcke zu einem Opcode usw.
+    std::cout << "Test" << std::endl;
     m_opcode = (m_memory[m_pc] << 8) | m_memory[m_pc + 1]; 
     m_pc += 2; // danach PC +2 hochzählen
 
@@ -67,5 +68,33 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     //6xnn
     //Annn
     //Dxyn
+    switch (m_opcode & 0xF000) {
+        case 0x0000 :
+          if (m_opcode == 0x00E0) {
+            std::cout << "clear screen..." << std::endl;
+            cleanScreen();
+          }  
+          break;
+        
+        case 0x6000 : //für 6XNN
+            m_register[x] = nn;
+          //normalen register sofort mit value laden
+            break;
 
+        case 0xA000 :
+            m_index = nnn;
+            //index register sofort mit value laden
+            break;
+
+        case 0xD000 : 
+            //(m_register[x], m_register[y], n); 
+            break;
+
+    }
+
+}
+
+void Chip8::cleanScreen() {
+    std::cout << "screen funk" << std::endl;
+    m_video.fill(0);
 }

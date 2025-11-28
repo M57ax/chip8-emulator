@@ -4,6 +4,10 @@
 #include <string>
 
 class Chip8{
+    public:
+        static constexpr int screenWidth = 64;
+        static constexpr int screenHeight = 32;
+
     private:
         std::array<char, 4096> m_memory = {};
         std::array<std::uint8_t, 16> m_register = {};
@@ -13,15 +17,15 @@ class Chip8{
         std::uint8_t m_delayTimer{};
         std::uint8_t m_soundTimer{};
         std::uint16_t m_opcode{};
-        
+        std::array<std::uint8_t, screenHeight * screenWidth> m_video = {};  
+       
         
 
     public:
-        static constexpr int screenWidth = 64;
-        static constexpr int screenHeight = 32;
-
+        
         void cycle();
 
+        void cleanScreen();
         void loadROM(const std::string& filePath);
 
     Chip8();
