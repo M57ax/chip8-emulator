@@ -52,7 +52,7 @@ void Chip8::loadROM(const std::string& filePath) {
 void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High und Low Byte werden kombiniert
     //High und Low werden zu einem opcode, der wird ausgeführt und der pc um 2 hochgezählt
     // danach werden die nächsten zwei Speicherblöcke zu einem Opcode usw.
-    std::cout << "Test" << std::endl;
+    //std::cout << "Test" << std::endl;
     m_opcode = (m_memory[m_pc] << 8) | m_memory[m_pc + 1]; 
     m_pc += 2; // danach PC +2 hochzählen
 
@@ -87,6 +87,9 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             break;
 
         case 0xD000 : 
+            std::cout << "Zeichnet?" << std::endl;
+            drawSprite(m_register[x], m_register[y], n);
+            //zeichnet n poxel and position Vx / Vy
             //(m_register[x], m_register[y], n); 
             break;
 
@@ -96,5 +99,37 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
 
 void Chip8::cleanScreen() {
     std::cout << "screen funk" << std::endl;
-    m_video.fill(0);
+    m_display.fill(0);
+}
+
+void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
+    //VF register auf 0 setzten
+    m_register[0xF] = 0; //Wegen Kollision
+    //Ein Sprite ist immer 8 Pixel/Bit breit aber die Höhe variiert, deswegen hier < height
+    // deshalb hier schleife über die Zeilen(also höhe)
+    for (int row = 0; row < height; row++) {
+        //Jedes Zeile des Sprites ist 8 Bit also 1 Byte 
+        uint8_t spriteByte = m_memory[m_index + row]; //indexregister
+        //row = 0 → m_memory[m_index + 0] → 1. Sprite-Zeile, dann row++
+        //row = 1 → m_memory[m_index + 1] → 2. Sprite-Zeile
+        // weiß nicht ob "bit" hier der richtige Name ist für diese Sprite pixel
+        for (int bit = 0; bit < 8; bit++) {
+            //Ich muss jetzt das linkeste Bit bzw Pixel holen
+            // verschiebung der pixel im Sprite
+            if (spriteByte & (0x80 >> bit)) { //binär 1000 0000
+                int px = (xPos + bit); //jetzt für jeden Pixel die Position berechen
+                int py = (yPos + row);
+                // umwandlung meines 2d arrays in ein 1d index mit dieser Formel: 
+                int index = py * screenWidth + px;
+                //kollision testen, wenn auf ein Pixel gezeichnet wird was 1 war, soll 0 werden
+                //und anders herum 0 zu 1, das ganze dann mit XOR
+                if (m_display[index] == 1) { //ist der pixel schon 1 ?
+                    m_register[0xF] = 1; // dann flag register auf 1
+                }
+                m_display[index] = m_display[index] ^ 1;
+                //1 XOR 1 = 0 → Pixel wird gelöscht
+                //0 XOR 1 = 1 → Pixel wird gesetzt
+            }
+        }
+    }
 }

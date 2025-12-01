@@ -17,16 +17,18 @@ class Chip8{
         std::uint8_t m_delayTimer{};
         std::uint8_t m_soundTimer{};
         std::uint16_t m_opcode{};
-        std::array<std::uint8_t, screenHeight * screenWidth> m_video = {};  
+        std::array<uint8_t, screenHeight * screenWidth> m_display = {};  
        
         
 
     public:
         
         void cycle();
-
+        void drawSprite(uint8_t xPos, uint8_t yPos, int height);
         void cleanScreen();
         void loadROM(const std::string& filePath);
+        const std::array<uint8_t, 64*32>& video() const { return m_display; }
+
 
     Chip8();
 };
