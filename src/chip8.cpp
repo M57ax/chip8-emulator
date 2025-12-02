@@ -65,11 +65,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     int x = (m_opcode & 0x0F00) >> 8;
     int y = (m_opcode & 0x00F0) >> 4;
     
-    //Jetzt dann Prüfung für die 4 Instructions
-    //00E0
-    //6xnn
-    //Annn
-    //Dxyn
     switch (m_opcode & 0xF000) {
         case 0x0000 :
           if (m_opcode == 0x00E0) {
@@ -89,7 +84,8 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
           //normalen register sofort mit value laden
             break;
     
-        case 0x700 : //für 7XNN
+        case 0x7000 : //für 7XNN
+            std::cout << "works?" << std::endl;
             m_register[x] += nn;
             break;
           
