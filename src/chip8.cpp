@@ -4,12 +4,12 @@
 #include <iostream>
 #include <fstream>
 
-Chip8::Chip8() {
+Chip8::Chip8() :m_index(0), m_pc(0x200) {
 
-    m_index = 0;
-    m_pc = 0x200;
-    m_delayTimer = 0;
-    m_soundTimer = 0;
+    //m_index = 0;
+    //m_pc = 0x200;
+    // m_delayTimer = 0;
+    // m_soundTimer = 0;
 
 //     const int FONTSET_START_ADDRESS = 0x50;
 //     const int FONTSET_SIZE = 80;
@@ -71,23 +71,29 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     switch (m_opcode & 0xF000) {
         case 0x0000 :
           if (m_opcode == 0x00E0) {
-            std::cout << "clear screen..." << std::endl;
+           // std::cout << "clear screen..." << std::endl;
             cleanScreen();
           }  
           break;
+
+        case 0x1000 : //für 1nnn jump
+            //std::cout << "Jump" << std::endl;
+            m_pc = nnn;
         
         case 0x6000 : //für 6XNN
+        //std::cout << "n register mit value laden" << std::endl;
             m_register[x] = nn;
           //normalen register sofort mit value laden
             break;
 
         case 0xA000 :
+        //std::cout << "index regi mit value laden" << std::endl;
             m_index = nnn;
             //index register sofort mit value laden
             break;
 
         case 0xD000 : 
-            std::cout << "Zeichnet?" << std::endl;
+          //  std::cout << "Zeichnet?" << std::endl;
             drawSprite(m_register[x], m_register[y], n);
             //zeichnet n poxel and position Vx / Vy
             //(m_register[x], m_register[y], n); 
@@ -120,6 +126,9 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
             if (spriteByte & (0x80 >> bit)) { //binär 1000 0000
                 int px = (xPos + bit); //jetzt für jeden Pixel die Position berechen
                 int py = (yPos + row);
+                if (px <0 || px >= screenWidth || py <0 || py >= screenHeight) {
+                    continue;
+                }
                 // umwandlung meines 2d arrays in ein 1d index mit dieser Formel: 
                 int index = py * screenWidth + px;
                 //kollision testen, wenn auf ein Pixel gezeichnet wird was 1 war, soll 0 werden

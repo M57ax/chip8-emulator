@@ -13,15 +13,15 @@ void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
     sf::RectangleShape pixel({scale, scale}); //den cast muss ich wegen sfml machen oder?
     pixel.setFillColor(sf::Color::White);
     //Display(64x32) von Chip8 holen
-    auto& display = chip8.video();
+    const auto& display = chip8.video();
     //disply holt das interne chip8 bild(aktueller zustand) = 
     // brücke zw. chip8 u. sfml
-    for ( int y = 0; y < chip8.screenHeight; y++) {
-        for (int x = 0; x < chip8.screenWidth; x++ ) {
-            int index = y * chip8.screenWidth + x;
+    for ( int y = 0; y < Chip8::screenHeight; y++) {
+        for (int x = 0; x < Chip8::screenWidth; x++ ) {
+            int index = y * Chip8::screenWidth + x;
             //wenn pixel "an", dann draw
             if (display[index]) {
-                pixel.setPosition({x * (float)scale, y * (float)scale});
+                pixel.setPosition({(float)x * (float)scale, (float)y * (float)scale});
                 window.draw(pixel);
             }
         }
