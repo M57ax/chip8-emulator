@@ -19,8 +19,6 @@ class Chip8{
         std::uint16_t m_opcode{};
         std::array<uint8_t, screenHeight * screenWidth> m_display = {};  
        
-        
-
     public:
         
         void cycle();

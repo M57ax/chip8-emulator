@@ -113,6 +113,7 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
         //row = 0 → m_memory[m_index + 0] → 1. Sprite-Zeile, dann row++
         //row = 1 → m_memory[m_index + 1] → 2. Sprite-Zeile
         // weiß nicht ob "bit" hier der richtige Name ist für diese Sprite pixel
+        // für jede der 8 Bit spalten in dem Byte
         for (int bit = 0; bit < 8; bit++) {
             //Ich muss jetzt das linkeste Bit bzw Pixel holen
             // verschiebung der pixel im Sprite

@@ -8,12 +8,24 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <iostream>
 
-void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, int scale)
+void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
 {
-    sf::RectangleShape pixel({(float)scale, (float)scale});
+    sf::RectangleShape pixel({scale, scale}); //den cast muss ich wegen sfml machen oder?
     pixel.setFillColor(sf::Color::White);
-    //Display(64x32 von Chip8 holen)
-    auto display = chip8.video();
+    //Display(64x32) von Chip8 holen
+    auto& display = chip8.video();
+    //disply holt das interne chip8 bild(aktueller zustand) = 
+    // brücke zw. chip8 u. sfml
+    for ( int y = 0; y < chip8.screenWidth; y++) {
+        for (int x = 0; x < chip8.screenHeight; x++ ) {
+            int index = y * chip8.screenWidth + x;
+
+            if (display[index]) {
+                pixel.setPosition({x * (float)scale, y * (float)scale});
+                window.draw(pixel);
+            }
+        }
+    }
 }
 
 int main()
@@ -23,20 +35,21 @@ int main()
     Chip8 chip8;
     chip8.loadROM("chip8-logo.ch8");
    
-    
-
-   while (window.isOpen())
-{
-    while (const std::optional event = window.pollEvent())
+    while (window.isOpen())
     {
-        if (event->is<sf::Event::Closed>())
-            window.close();
+        while (const std::optional event = window.pollEvent())
+        {
+            if (event->is<sf::Event::Closed>()) {
+                window.close();
+            }
+        }
+
+        chip8.cycle(); // einmal pro Frame
+        window.clear();
+        drawDisplay(window, chip8, screenScale);
+        window.display();
     }
-
-    chip8.cycle(); // einmal pro Frame
-
-    window.clear();
-    drawDisplay(window, chip8, screenScale);
-    window.display();
 }
-}
+
+//hier morgen code nochmal überarbeiten, die funktionen
+//genau beschreiben und nochmal vernünftiger cleanup
