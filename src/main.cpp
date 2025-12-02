@@ -16,10 +16,10 @@ void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
     auto& display = chip8.video();
     //disply holt das interne chip8 bild(aktueller zustand) = 
     // brücke zw. chip8 u. sfml
-    for ( int y = 0; y < chip8.screenWidth; y++) {
-        for (int x = 0; x < chip8.screenHeight; x++ ) {
+    for ( int y = 0; y < chip8.screenHeight; y++) {
+        for (int x = 0; x < chip8.screenWidth; x++ ) {
             int index = y * chip8.screenWidth + x;
-
+            //wenn pixel "an", dann draw
             if (display[index]) {
                 pixel.setPosition({x * (float)scale, y * (float)scale});
                 window.draw(pixel);

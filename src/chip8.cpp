@@ -60,8 +60,8 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     int n = m_opcode & 0x000F;
     int nn = m_opcode & 0x00FF;
     int nnn = m_opcode & 0x0FFF;
-    int x = m_opcode & 0x0F00 >> 8;
-    int y = m_opcode & 0x00F0 >> 4;
+    int x = (m_opcode & 0x0F00) >> 8;
+    int y = (m_opcode & 0x00F0) >> 4;
     
     //Jetzt dann Prüfung für die 4 Instructions
     //00E0
