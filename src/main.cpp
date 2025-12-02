@@ -20,7 +20,7 @@ void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
         for (int x = 0; x < Chip8::screenWidth; x++ ) {
             int index = y * Chip8::screenWidth + x;
             //wenn pixel "an", dann draw
-            if (display[index]) {
+            if (display[index] != 0U) {
                 pixel.setPosition({(float)x * (float)scale, (float)y * (float)scale});
                 window.draw(pixel);
             }

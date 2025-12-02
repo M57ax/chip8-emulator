@@ -9,7 +9,9 @@ class Chip8{
         static constexpr int screenHeight = 32;
 
     private:
-        std::array<char, 4096> m_memory = {};
+        // hatte davor char und das kann sehr leicht vom compiler 
+        // als signed behandelt werden
+        std::array<std::uint8_t, 4096> m_memory = {};
         std::array<std::uint8_t, 16> m_register = {};
         std::uint16_t m_index{};
         std::uint16_t m_pc{};     //program count
@@ -25,7 +27,7 @@ class Chip8{
         void drawSprite(uint8_t xPos, uint8_t yPos, int height);
         void cleanScreen();
         void loadROM(const std::string& filePath);
-        const std::array<uint8_t, 64*32>& video() const { return m_display; }
+        const std::array<uint8_t, screenWidth*screenHeight>& video() const { return m_display; }
 
 
     Chip8();

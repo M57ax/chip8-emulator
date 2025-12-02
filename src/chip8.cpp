@@ -40,7 +40,9 @@ Chip8::Chip8() :m_index(0), m_pc(0x200) {
 void Chip8::loadROM(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::binary);
     if (file) {
-        file.read(&m_memory[m_pc], 4096 - 0x200);
+        // explizieter cast zu char*
+        // example : reinterpret_cast<char*>(&d), sizeof d)
+        file.read(reinterpret_cast<char*>(&m_memory[m_pc]), 4096 - 0x200);
         std::cout << "ROM File successfully loaded" << std::endl;
         
     } else {
@@ -79,12 +81,18 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
         case 0x1000 : //für 1nnn jump
             //std::cout << "Jump" << std::endl;
             m_pc = nnn;
+            break;
         
         case 0x6000 : //für 6XNN
         //std::cout << "n register mit value laden" << std::endl;
             m_register[x] = nn;
           //normalen register sofort mit value laden
             break;
+    
+        case 0x700 : //für 7XNN
+            m_register[x] += nn;
+            break;
+          
 
         case 0xA000 :
         //std::cout << "index regi mit value laden" << std::endl;
