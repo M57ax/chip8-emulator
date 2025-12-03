@@ -71,18 +71,21 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
           if (m_opcode == 0x00E0) {
            // std::cout << "clear screen..." << std::endl;
             cleanScreen();
+            break;
            }  else if (m_opcode == 0x00EE) {
             std::cout << "00EE" << std::endl;
             --m_sp;
             m_pc = m_stack[m_sp];
+            break;
+            
           } 
           break;
 
         case 0x2000: //2nnn
-            std::cout << "???" << std::endl;
+            std::cout << "2nnn" << std::endl;
             m_stack[m_sp] = m_pc;
             ++m_sp;
-            m_pc = nnn;
+            m_pc = m_opcode & 0x0FFF;
             break;
 
         case 0x1000 : //für 1nnn jump
@@ -95,11 +98,22 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 std::cout << "3xnn" << std::endl;
               m_pc += 2;
             }
+
+        case 0x4000 :
+            if (m_register[x] != nn) {
+                std::cout << "4xnn" << std::endl;
+                m_pc +=2;
+            }
+
+
+
+            break;
         case 0x5000 : //für 5xy0
             if (m_register[x] == m_register[y]) {
                 std::cout << "5xy0" << std::endl;
                 m_pc +=2;
             }
+            break;
                         
 
 
@@ -110,9 +124,67 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             break;
     
         case 0x7000 : //für 7XNN
-            std::cout << "works?" << std::endl;
             m_register[x] += nn;
             break;
+
+        case 0x8000 : 
+               
+                ///////////////////////////
+            switch (m_opcode & 0x000F){
+            
+                case 0x0000: 
+                    std::cout << "8XY0" << std::endl;
+                    m_register[x] = m_register[y];
+                    break;
+                //     if (m_opcode == 0x0000) {
+                //     std::cout << "8XY0" << std::endl;
+                //     m_register[x] = m_register[y];
+                //     break;
+                // }
+                
+
+
+                case 0x0001:
+                    std::cout << "8XY1" << std::endl;
+                    m_register[x] |= m_register[y];
+                    break;
+
+                case 0x0004:
+                    std::cout << "8XY4" << std::endl;
+                    m_register[x] += m_register[y];
+                    if (m_register[x] > 255) {
+                        m_register[0xF] = 1;
+                        
+                    } else {
+                        m_register[0xF] = 0;
+                        
+                    }
+                break;
+
+                case 0x0005:
+                    std::cout << "8XY5" << std::endl;
+                    m_register[x] -= m_register[y];
+                    if (m_register[x] > m_register[y]) {
+                        m_register[0xF] = 1;
+                        
+                    } else {
+                        m_register[0xF] = 0;
+                        
+                    }
+                break;
+
+                case 0x0006:
+                    std::cout << "8XY6" << std::endl;
+                    (m_register[x] = m_register[y] >> 1) || (m_register[x] = m_register[x] >> 1);
+                    break;
+
+                case 0x0007:
+                    std::cout << "8XY7" << std::endl;
+                    m_register[x] = m_register[y] - m_register[x];
+                    
+                break;
+       }
+       break;
           
 
         case 0xA000 :
@@ -128,6 +200,19 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             //(m_register[x], m_register[y], n); 
             break;
 
+        case 0xF000 : 
+            switch (m_opcode & 0x00FF) {    //FX55? 
+                case 0x0055 : 
+                std::cout << "FX55?" << std::endl;
+                for (int i = 0; i <= x; ++i) {
+                    m_memory[m_index + i] = m_register[i];
+                    m_index += x + 1;
+                    m_pc += 2;
+                    break;
+                }
+            
+            } break;
+    
     }
 
 }
