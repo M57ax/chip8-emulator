@@ -71,19 +71,19 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
           if (m_opcode == 0x00E0) {
            // std::cout << "clear screen..." << std::endl;
             cleanScreen();
-           }  //else if (m_opcode == 0x00EE) {
-        //     std::cout << "00EE" << std::endl;
-        //     --m_sp;
-        //     m_pc = m_stack[m_sp];
-        //   } 
+           }  else if (m_opcode == 0x00EE) {
+            std::cout << "00EE" << std::endl;
+            --m_sp;
+            m_pc = m_stack[m_sp];
+          } 
           break;
 
-        // case 0x2000: //2nnn
-        //     std::cout << "???" << std::endl;
-        //     m_stack[m_sp] = m_pc;
-        //     ++m_sp;
-        //     m_pc = nnn;
-        //     break;
+        case 0x2000: //2nnn
+            std::cout << "???" << std::endl;
+            m_stack[m_sp] = m_pc;
+            ++m_sp;
+            m_pc = nnn;
+            break;
 
         case 0x1000 : //für 1nnn jump
             //std::cout << "Jump" << std::endl;
@@ -95,7 +95,14 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 std::cout << "3xnn" << std::endl;
               m_pc += 2;
             }
-        
+        case 0x5000 : //für 5xy0
+            if (m_register[x] == m_register[y]) {
+                std::cout << "5xy0" << std::endl;
+                m_pc +=2;
+            }
+                        
+
+
         case 0x6000 : //für 6XNN
         //std::cout << "n register mit value laden" << std::endl;
             m_register[x] = nn;
