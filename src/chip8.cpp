@@ -136,17 +136,20 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                     std::cout << "8XY0" << std::endl;
                     m_register[x] = m_register[y];
                     break;
-                //     if (m_opcode == 0x0000) {
-                //     std::cout << "8XY0" << std::endl;
-                //     m_register[x] = m_register[y];
-                //     break;
-                // }
-                
-
-
+              
                 case 0x0001:
                     std::cout << "8XY1" << std::endl;
                     m_register[x] |= m_register[y];
+                    break;
+
+                case 0x0002:
+                    std::cout << "8XY2" << std::endl;
+                    m_register[x] &= m_register[y];
+                    break;
+
+                case 0x0003: 
+                    std::cout << "8XY3" << std::endl;
+                    m_register[x] ^= m_register[y];
                     break;
 
                 case 0x0004:
@@ -159,7 +162,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                         m_register[0xF] = 0;
                         
                     }
-                break;
+                    break;
 
                 case 0x0005:
                     std::cout << "8XY5" << std::endl;
@@ -176,6 +179,11 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 case 0x0006:
                     std::cout << "8XY6" << std::endl;
                     (m_register[x] = m_register[y] >> 1) || (m_register[x] = m_register[x] >> 1);
+                    break;
+
+                case 0x000E:
+                    std::cout << "8XYE" << std::endl;
+                    (m_register[x] = m_register[y] << 1) || (m_register[x] = m_register[x] << 1);
                     break;
 
                 case 0x0007:
@@ -202,16 +210,46 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
 
         case 0xF000 : 
             switch (m_opcode & 0x00FF) {    //FX55? 
+                case 0x001E : 
+                std::cout << "FX1E" << std::endl;
+                m_index += m_register[x];
+                break;
+                //Wert von VX in Dezimalstellen zerlegen (Hunderter, Zehner, Einer)
+                case 0x0033 :
+                std::cout << "FX33" << std::endl;
+                m_memory[m_index] = m_register[x] / 100;
+                m_memory[m_index + 1] = (m_register[x] / 10) % 10; 
+                m_memory[m_index + 2] = (m_register[x] / 10) % 10; 
+
+
+                break;
+
+
                 case 0x0055 : 
                 std::cout << "FX55?" << std::endl;
                 for (int i = 0; i <= x; ++i) {
                     m_memory[m_index + i] = m_register[i];
                     m_index += x + 1;
-                    m_pc += 2;
+                    m_pc += 2; 
                     break;
                 }
+                
+
+                case 0x0065 :
+                std::cout << "FX65" << std::endl;
+                for (int i = 0; i <= x; ++i) {
+                    m_register[i] = m_memory[m_index + 1];
+                break;
+                }
+                
             
             } break;
+        
+        case 0x9000:
+            std::cout << "9xy0" << std::endl;
+            if (m_register[x] != m_register[y]) {
+                m_pc += 2;
+            }
     
     }
 
