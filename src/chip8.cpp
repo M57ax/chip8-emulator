@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-Chip8::Chip8() :m_index(0), m_pc(0x200) {
+Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
 
     //m_index = 0;
     //m_pc = 0x200;
@@ -42,6 +42,7 @@ void Chip8::loadROM(const std::string& filePath) {
     if (file) {
         // explizieter cast zu char*
         // example : reinterpret_cast<char*>(&d), sizeof d)
+        // mit christoph geredet: streams sind doof
         file.read(reinterpret_cast<char*>(&m_memory[m_pc]), 4096 - 0x200);
         std::cout << "ROM File successfully loaded" << std::endl;
         
@@ -70,13 +71,30 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
           if (m_opcode == 0x00E0) {
            // std::cout << "clear screen..." << std::endl;
             cleanScreen();
-          }  
+           }  //else if (m_opcode == 0x00EE) {
+        //     std::cout << "00EE" << std::endl;
+        //     --m_sp;
+        //     m_pc = m_stack[m_sp];
+        //   } 
           break;
+
+        // case 0x2000: //2nnn
+        //     std::cout << "???" << std::endl;
+        //     m_stack[m_sp] = m_pc;
+        //     ++m_sp;
+        //     m_pc = nnn;
+        //     break;
 
         case 0x1000 : //für 1nnn jump
             //std::cout << "Jump" << std::endl;
             m_pc = nnn;
             break;
+
+        case 0x3000 :
+            if (m_register[x] == nn) {
+                std::cout << "3xnn" << std::endl;
+              m_pc += 2;
+            }
         
         case 0x6000 : //für 6XNN
         //std::cout << "n register mit value laden" << std::endl;

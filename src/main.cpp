@@ -33,7 +33,7 @@ int main()
     constexpr int screenScale = 15;
     sf::RenderWindow window(sf::VideoMode({Chip8::screenWidth * screenScale , Chip8::screenHeight * screenScale}), "Chip-8 Emulator");
     Chip8 chip8;
-    chip8.loadROM("chip8-logo.ch8");
+    chip8.loadROM("corax+.ch8");
    
     while (window.isOpen())
     {

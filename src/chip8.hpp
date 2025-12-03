@@ -9,13 +9,14 @@ class Chip8{
         static constexpr int screenHeight = 32;
 
     private:
-        // hatte davor char und das kann sehr leicht vom compiler 
+        // hatte davor char(war blöd, ich weiß) und das kann sehr leicht vom compiler 
         // als signed behandelt werden
         std::array<std::uint8_t, 4096> m_memory = {};
         std::array<std::uint8_t, 16> m_register = {};
         std::uint16_t m_index{};
         std::uint16_t m_pc{};     //program count
-        std::uint16_t m_stack{};
+        std::array<std::uint16_t, 16> m_stack{};
+        std::uint8_t m_sp; // stackPointer
         std::uint8_t m_delayTimer{};
         std::uint8_t m_soundTimer{};
         std::uint16_t m_opcode{};
