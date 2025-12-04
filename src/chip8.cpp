@@ -68,18 +68,23 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     
     switch (m_opcode & 0xF000) {
         case 0x0000 :
+            
           if (m_opcode == 0x00E0) {
            // std::cout << "clear screen..." << std::endl;
             cleanScreen();
-            break;
+            
            }  else if (m_opcode == 0x00EE) {
             std::cout << "00EE" << std::endl;
             --m_sp;
             m_pc = m_stack[m_sp];
-            break;
+            
             
           } 
           break;
+
+
+//Schauen warum 00EE nicht geht, hat vemrutlich etwas mit dem stack zutun? also kann ich mir nur vorstellen
+
 
         case 0x2000: //2nnn
             std::cout << "2nnn" << std::endl;
@@ -98,6 +103,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 std::cout << "3xnn" << std::endl;
               m_pc += 2;
             }
+            break;
 
         case 0x4000 :
             if (m_register[x] != nn) {
@@ -229,18 +235,23 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 std::cout << "FX55?" << std::endl;
                 for (int i = 0; i <= x; ++i) {
                     m_memory[m_index + i] = m_register[i];
-                    m_index += x + 1;
-                    m_pc += 2; 
-                    break;
+                    
+                    
                 }
+                m_index += x + 1;
+                m_pc += 2;  
+                break;
                 
 
                 case 0x0065 :
                 std::cout << "FX65" << std::endl;
                 for (int i = 0; i <= x; ++i) {
-                    m_register[i] = m_memory[m_index + 1];
+                    m_register[i] = m_memory[m_index + i];
+                
+                } 
+                // m_index += x + 1;
+                // m_pc += 2;  
                 break;
-                }
                 
             
             } break;
