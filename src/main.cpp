@@ -50,6 +50,3 @@ int main()
         window.display();
     }
 }
-
-//hier morgen code nochmal überarbeiten, die funktionen
-//genau beschreiben und nochmal vernünftiger cleanup

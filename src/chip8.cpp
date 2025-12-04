@@ -82,10 +82,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
           } 
           break;
 
-
-//Schauen warum 00EE nicht geht, hat vemrutlich etwas mit dem stack zutun? also kann ich mir nur vorstellen
-
-
         case 0x2000: //2nnn
             std::cout << "2nnn" << std::endl;
             m_stack[m_sp] = m_pc;
@@ -134,8 +130,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             break;
 
         case 0x8000 : 
-               
-                ///////////////////////////
+
             switch (m_opcode & 0x000F){
             
                 case 0x0000: 
@@ -223,10 +218,17 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 //Wert von VX in Dezimalstellen zerlegen (Hunderter, Zehner, Einer)
                 case 0x0033 :
                 std::cout << "FX33" << std::endl;
-                m_memory[m_index] = m_register[x] / 100;
-                m_memory[m_index + 1] = (m_register[x] / 10) % 10; 
-                m_memory[m_index + 2] = (m_register[x] / 10) % 10; 
 
+                m_memory[m_index + 2] = m_register[x]  % 10;
+                m_register[x] /= 10;
+                
+                m_memory[m_index + 1] = m_register[x] % 10; 
+                m_register[x] /= 10;
+
+                m_memory[m_index] = m_register[x] % 100;
+                
+             
+                //m_pc += 2;
 
                 break;
 
@@ -235,8 +237,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 std::cout << "FX55?" << std::endl;
                 for (int i = 0; i <= x; ++i) {
                     m_memory[m_index + i] = m_register[i];
-                    
-                    
                 }
                 m_index += x + 1;
                 m_pc += 2;  
