@@ -78,7 +78,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             --m_sp;
             m_pc = m_stack[m_sp];
             
-            
           } 
           break;
 
@@ -107,8 +106,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 m_pc +=2;
             }
 
-
-
             break;
         case 0x5000 : //für 5xy0
             if (m_register[x] == m_register[y]) {
@@ -117,8 +114,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             }
             break;
                         
-
-
         case 0x6000 : //für 6XNN
         //std::cout << "n register mit value laden" << std::endl;
             m_register[x] = nn;
@@ -167,24 +162,30 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
 
                 case 0x0005:
                     std::cout << "8XY5" << std::endl;
-                    m_register[x] -= m_register[y];
-                    if (m_register[x] > m_register[y]) {
-                        m_register[0xF] = 1;
-                        
-                    } else {
+                     
+                    if (m_register[y] > m_register[x]) {
                         m_register[0xF] = 0;
                         
+                    } else {
+                        m_register[0xF] = 1;
                     }
+                   m_register[x] -= m_register[y];
                 break;
 
                 case 0x0006:
+                // LEtzte Bit von VW wird gespeichert, schiebt VX um 1 nach rechts 1 wenn ungerade war, 0 wenn es gerade war
                     std::cout << "8XY6" << std::endl;
-                    (m_register[x] = m_register[y] >> 1) || (m_register[x] = m_register[x] >> 1);
+                    m_register[0xF] = m_register[x] & 0x1;
+                    m_register[x] >>=1;
+                   
                     break;
 
                 case 0x000E:
+                
                     std::cout << "8XYE" << std::endl;
-                    (m_register[x] = m_register[y] << 1) || (m_register[x] = m_register[x] << 1);
+                    m_register[0xF] = m_register[x] >> 7;
+                    m_register[x] <<=1;
+                    //(m_register[x] = m_register[y] << 1) || (m_register[x] = m_register[x] << 1);
                     break;
 
                 case 0x0007:
@@ -195,7 +196,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
        }
        break;
           
-
         case 0xA000 :
         //std::cout << "index regi mit value laden" << std::endl;
             m_index = nnn;
@@ -226,12 +226,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 m_register[x] /= 10;
 
                 m_memory[m_index] = m_register[x] % 100;
-                
-             
-                //m_pc += 2;
-
                 break;
-
 
                 case 0x0055 : 
                 std::cout << "FX55?" << std::endl;
@@ -242,7 +237,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 m_pc += 2;  
                 break;
                 
-
                 case 0x0065 :
                 std::cout << "FX65" << std::endl;
                 for (int i = 0; i <= x; ++i) {
@@ -253,7 +247,6 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 // m_pc += 2;  
                 break;
                 
-            
             } break;
         
         case 0x9000:
