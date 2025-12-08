@@ -33,7 +33,11 @@ int main()
     constexpr int screenScale = 15;
     sf::RenderWindow window(sf::VideoMode({Chip8::screenWidth * screenScale , Chip8::screenHeight * screenScale}), "Chip-8 Emulator");
     Chip8 chip8;
-    chip8.loadROM("corax+.ch8");
+    chip8.loadROM("flags.ch8");
+    // 1 Checkmark = Ergebniswert korrekt
+    // 2 Checkmark = Flag Register VF korrekt
+    // 3 Checkmark = VF als Eingabe Register Vy verwendbar also Verwendet mein Emulator den alten Wert von VF, wenn VF = Vy verwendet wird?
+    // 4 Checkmark = VF als Eingabe Register Vx verwendbar also Verwendet mein Emulator den alten Wert von VF, wenn VF = Vx verwendet wird?
    
     while (window.isOpen())
     {
@@ -50,3 +54,5 @@ int main()
         window.display();
     }
 }
+//Bin gerade dabei die Mathematischen Instructions anzupassen, damit die Flags richtig gesetzt sind.
+// Fehler bei mir, ich überschreibe das Flagregister zu früh.
