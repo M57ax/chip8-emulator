@@ -193,18 +193,22 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 case 0x0006: {
                 // LEtzte Bit von VW wird gespeichert, schiebt VX um 1 nach rechts 1 wenn ungerade war, 0 wenn es gerade war
                     std::cout << "8XY6" << std::endl;
-                    m_register[0xF] = m_register[x] & 0x1U;
+                    uint8_t vx = m_register[x];
                     m_register[x] >>=1;
+                    m_register[0xF] = (vx & 0x1u);
+                    
                    
                     break;
                 }
-                case 0x000E:
-                
+                case 0x000E: {
+                    uint8_t vx = m_register[x];
                     std::cout << "8XYE" << std::endl;
-                    m_register[0xF] = (m_register[x] & 0x80u) >>7U;
-                    m_register[x] <<= 1;
+                    m_register[x] = m_register[x] << 1;;
+                    m_register[0xF] = (vx & 0x80u) >> 7u;
+                    
+                    
                     break;
-
+                }
                 case 0x0007: {
                     std::cout << "8XY7" << std::endl;
                     uint8_t vx = m_register[x];
