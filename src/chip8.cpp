@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <random>
+#include "font.hpp"
+
 
 Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
 
@@ -10,31 +13,6 @@ Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
     //m_pc = 0x200;
     // m_delayTimer = 0;
     // m_soundTimer = 0;
-
-//     const int FONTSET_START_ADDRESS = 0x50;
-//     const int FONTSET_SIZE = 80;
-
-
-//     uint8_t fontset[FONTSET_SIZE] =
-//     {
-// 	0xF0, 0x90, 0x90, 0x90, 0xF0,      // 0
-// 	0x20, 0x60, 0x20, 0x20, 0x70,      // 1
-// 	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-// 	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-// 	0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-// 	0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-// 	0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-// 	0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-// 	0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-// 	0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-// 	0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-// 	0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-// 	0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-// 	0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-// 	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-// 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-//     };
-
 }
 
 void Chip8::loadROM(const std::string& filePath) {
@@ -232,6 +210,18 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             //index register sofort mit value laden
             break;
 
+        case 0xB000 :
+            m_pc = (m_opcode & 0x0FFF);
+            m_pc += m_register[0];
+            break;
+
+        case 0xC000 : {
+            std::random_device rd;
+            std::mt19937 generate(rd());
+            std::uniform_int_distribution<uint8_t> dist (0,255);
+            m_register[x] = dist(generate) & nn;
+            break;
+        }
         case 0xD000 : 
           //  std::cout << "Zeichnet?" << std::endl;
             drawSprite(m_register[x], m_register[y], n);

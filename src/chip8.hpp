@@ -21,6 +21,7 @@ class Chip8{
         std::uint8_t m_soundTimer{};
         std::uint16_t m_opcode{};
         std::array<uint8_t, screenHeight * screenWidth> m_display = {};  
+        std::array<uint8_t, 16> keypad{};
        
     public:
         
