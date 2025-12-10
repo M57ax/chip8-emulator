@@ -5,7 +5,7 @@
 #include <fstream>
 #include <random>
 #include "font.hpp"
-
+#include <SFML/Window/Keyboard.hpp>
 
 Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
 
@@ -18,9 +18,7 @@ Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
 void Chip8::loadROM(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::binary);
     if (file) {
-        // explizieter cast zu char*
-        // example : reinterpret_cast<char*>(&d), sizeof d)
-        // mit christoph geredet: streams sind doof
+        m_memory[0x1FF] = 0;
         file.read(reinterpret_cast<char*>(&m_memory[m_pc]), 4096 - 0x200);
         std::cout << "ROM File successfully loaded" << std::endl;
         
@@ -55,7 +53,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             cleanScreen();
             
            }  else if (m_opcode == 0x00EE) {
-            std::cout << "00EE" << std::endl;
+            //std::cout << "00EE" << std::endl;
             --m_sp;
             m_pc = m_stack[m_sp];
             
@@ -63,7 +61,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
           break;
 
         case 0x2000: //2nnn
-            std::cout << "2nnn" << std::endl;
+            //std::cout << "2nnn" << std::endl;
             m_stack[m_sp] = m_pc;
             ++m_sp;
             m_pc = m_opcode & 0x0FFF;
@@ -76,14 +74,14 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
 
         case 0x3000 :
             if (m_register[x] == nn) {
-                std::cout << "3xnn" << std::endl;
+                //std::cout << "3xnn" << std::endl;
               m_pc += 2;
             }
             break;
 
         case 0x4000 :
             if (m_register[x] != nn) {
-                std::cout << "4xnn" << std::endl;
+                //std::cout << "4xnn" << std::endl;
                 m_pc +=2;
             }
             break;
@@ -92,7 +90,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
 
         uint8_t vy = m_register[y];
             if (vx == vy) {
-                std::cout << "5xy0" << std::endl;
+                //std::cout << "5xy0" << std::endl;
                 m_pc +=2;
             }
             break;
@@ -115,28 +113,28 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             switch (m_opcode & 0x000F){
             
                 case 0x0000: 
-                    std::cout << "8XY0" << std::endl;
+                    //std::cout << "8XY0" << std::endl;
                     m_register[x] = m_register[y];
                     break;
               
                 case 0x0001:
-                    std::cout << "8XY1" << std::endl;
+                    //std::cout << "8XY1" << std::endl;
                     m_register[x] |= m_register[y];
                     break;
 
                 case 0x0002:
-                    std::cout << "8XY2" << std::endl;
+                    //std::cout << "8XY2" << std::endl;
                     m_register[x] &= m_register[y];
                     break;
 
                 case 0x0003: 
-                    std::cout << "8XY3" << std::endl;
+                  //  std::cout << "8XY3" << std::endl;
                     m_register[x] ^= m_register[y];
                     break;
 
              case 0x0004:
                 {
-                std::cout << "8XY4" << std::endl;
+                //std::cout << "8XY4" << std::endl;
                 //zuerst vx und vy aus den regsitern m_register[x ud y] lesen
                 //und dann VF setzten
    
@@ -158,7 +156,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 {
                 uint8_t vx = m_register[x];
                 uint8_t vy = m_register[y];
-                std::cout << "8XY5" << std::endl;
+                //std::cout << "8XY5" << std::endl;
                 m_register[x] = static_cast<uint8_t>(vx - vy);
                 if (vx >= vy) {
                     m_register[0xF] = 1;   // Kein Borrow
@@ -170,25 +168,30 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             }
                 case 0x0006: {
                 // LEtzte Bit von VW wird gespeichert, schiebt VX um 1 nach rechts 1 wenn ungerade war, 0 wenn es gerade war
-                    std::cout << "8XY6" << std::endl;
+                    //std::cout << "8XY6" << std::endl;
                     uint8_t vx = m_register[x];
-                    m_register[x] >>=1;
+                    uint8_t vy = m_register[y];
+                    vx = vy;
                     m_register[0xF] = (vx & 0x1u);
+                    m_register[x] = ( vx >>1);
                     
-                   
                     break;
                 }
                 case 0x000E: {
                     uint8_t vx = m_register[x];
-                    std::cout << "8XYE" << std::endl;
-                    m_register[x] = m_register[x] << 1;;
+                    uint8_t vy = m_register[y];
+                    vx = vy;
+                    //std::cout << "8XYE" << std::endl;
                     m_register[0xF] = (vx & 0x80u) >> 7u;
+                    m_register[x] = (vx <<1);
+                    //ich hatte davor das ale vVx genommen (also das ohne vx = vy)
+                    
                     
                     
                     break;
                 }
                 case 0x0007: {
-                    std::cout << "8XY7" << std::endl;
+                    //std::cout << "8XY7" << std::endl;
                     uint8_t vx = m_register[x];
                     uint8_t vy = m_register[y];
                     m_register[x] = static_cast<uint8_t>(vy - vx);
@@ -211,8 +214,9 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             break;
 
         case 0xB000 :
-            m_pc = (m_opcode & 0x0FFF);
-            m_pc += m_register[0];
+        std::cout << "BNNN" << std::endl;
+            m_pc = nnn + m_register[0];
+            
             break;
 
         case 0xC000 : {
@@ -229,56 +233,99 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             //(m_register[x], m_register[y], n); 
             break;
 
+        case 0xE000 : 
+            switch (m_opcode & 0x00FF) {
+                    case 0x009E: {
+                        auto i = m_register[x] & 0xF;
+                    if (sf::Keyboard::isKeyPressed(keymap[i])) m_pc += 2;
+                    break;
+                    }
+                    case 0x00A1: {
+                        auto i = m_register[x] & 0xF;
+                        if (!sf::Keyboard::isKeyPressed(keymap[i])) m_pc += 2;
+                    break;
+                    }
+                }
+            break;
         case 0xF000 : 
-            switch (m_opcode & 0x00FF) {    //FX55? 
+            switch (m_opcode & 0x00FF) {   
+                case 0x007 :
+                    m_register[x] = m_delayTimer;
+                    break;
+
+                case 0x015 :
+                    m_delayTimer = m_register[x];
+                    break;
+
                 case 0x001E : 
-                std::cout << "FX1E" << std::endl;
-                m_index += m_register[x];
-                break;
+                    m_index += m_register[x];
+                    break;
                 //Wert von VX in Dezimalstellen zerlegen (Hunderter, Zehner, Einer)
                 case 0x0033 :
                 {
-                std::cout << "FX33" << std::endl;
-                uint8_t value = m_register[x];
-                m_memory[m_index + 2] = value  % 10;
-                value /= 10;
+                    uint8_t value = m_register[x];
+                    m_memory[m_index + 2] = value  % 10;
+                    value /= 10;
                 
-                m_memory[m_index + 1] = value % 10; 
-                value /= 10;
+                    m_memory[m_index + 1] = value % 10; 
+                    value /= 10;
 
-                m_memory[m_index] = value % 10;
+                    m_memory[m_index] = value % 10;
                 break;
                 }
-                case 0x0055 : 
-                std::cout << "FX55?" << std::endl;
-                for (int i = 0; i <= x; ++i) {
-                    m_memory[m_index + i] = m_register[i];
+
+                case 0x000A : 
+                {
+                    const auto key = keymap[m_key_down];
+                    if (m_key_down != 255 && !sf::Keyboard::isKeyPressed(key)) {
+                        m_register[x] = m_key_down;
+                        m_key_down = 255;
+                        return;
+                    }
+                    for (uint8_t i = 0; i < static_cast<uint8_t>(keymap.size()); i++) {
+                        if (sf::Keyboard::isKeyPressed(keymap[i])) {
+                            m_key_down = i;
+                        }
+                    }
+                    m_pc -= 2;
+                    break;
                 }
-                // m_index += x + 1;
-                // m_pc += 2;  
+                break;
+                case 0x0055 : 
+                    for (int i = 0; i <= x; ++i) {
+                        m_memory[m_index + i] = m_register[i];
+                }
+
                 break;
                 
                 case 0x0065 :
-                std::cout << "FX65" << std::endl;
-                for (int i = 0; i <= x; ++i) {
-                    m_register[i] = m_memory[m_index + i];
+                    for (int i = 0; i <= x; ++i) {
+                        m_register[i] = m_memory[m_index + i];
                 
-                } 
-                // m_index += x + 1;
-                // m_pc += 2;  
+                }   
                 break;
                 
             } break;
         
         case 0x9000:
-    if ((m_opcode & 0x000F) == 0x0 && m_register[x] != m_register[y]) {
-        m_pc += 2;
-    }
+            if ((m_opcode & 0x000F) == 0x0 && m_register[x] != m_register[y]) {
+                m_pc += 2;
+            }
     break;
     
     }
-
+    if (m_delayTimer > 0) {
+        --m_delayTimer;
+    }
 }
+
+void Chip8::setKey(uint8_t key, bool pressed) {
+    if (key < m_keypad.size()) {
+        std::cout << "Teeest" << std::endl;
+        m_keypad[key] = pressed;
+        
+    } 
+};
 
 void Chip8::cleanScreen() {
     std::cout << "screen funk" << std::endl;
