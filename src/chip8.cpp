@@ -343,6 +343,8 @@ void Chip8::cleanScreen() {
 }
 
 void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
+    xPos = xPos % screenWidth; //so nur für Startbit
+    yPos = yPos % screenHeight;
     //VF register auf 0 setzten
     m_register[0xF] = 0; //Wegen Kollision
     //Ein Sprite ist immer 8 Pixel/Bit breit aber die Höhe variiert, deswegen hier < height
@@ -352,19 +354,18 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
         uint8_t spriteByte = m_memory[m_index + row]; //indexregister
         //row = 0 → m_memory[m_index + 0] → 1. Sprite-Zeile, dann row++
         //row = 1 → m_memory[m_index + 1] → 2. Sprite-Zeile
-        // weiß nicht ob "bit" hier der richtige Name ist für diese Sprite pixel
         // für jede der 8 Bit spalten in dem Byte
         for (int bit = 0; bit < 8; bit++) {
             //Ich muss jetzt das linkeste Bit bzw Pixel holen
             // verschiebung der pixel im Sprite
             if (spriteByte & (0x80 >> bit)) { //binär 1000 0000
-                int px = (xPos + bit) % 64; //jetzt für jeden Pixel die Position berechen
-                int py = (yPos + row) % 32;
-                if (px <0 || px >= screenWidth || py <0 || py >= screenHeight) {
+                int px = (xPos + bit); //jetzt für jeden Pixel die Position berechen
+                int py = (yPos + row); //mit Modulo den Wrap nach links und rechts richtig machen
+                if (px >= screenWidth || py >= screenHeight) {
                     continue;
                 }
                 // umwandlung meines 2d arrays in ein 1d index mit dieser Formel: 
-                int index = py * screenWidth + px;
+                int index = py * screenWidth + px ;
                 //kollision testen, wenn auf ein Pixel gezeichnet wird was 1 war, soll 0 werden
                 //und anders herum 0 zu 1, das ganze dann mit XOR
                 if (m_display[index] == 1) { //ist der pixel schon 1 ?
