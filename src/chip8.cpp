@@ -120,16 +120,19 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 case 0x0001:
                     //std::cout << "8XY1" << std::endl;
                     m_register[x] |= m_register[y];
+                    m_register[0xF] = 0;
                     break;
 
                 case 0x0002:
                     //std::cout << "8XY2" << std::endl;
                     m_register[x] &= m_register[y];
+                    m_register[0xF] = 0;
                     break;
 
                 case 0x0003: 
                   //  std::cout << "8XY3" << std::endl;
                     m_register[x] ^= m_register[y];
+                    m_register[0xF] = 0;
                     break;
 
              case 0x0004:
@@ -295,14 +298,18 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                     for (int i = 0; i <= x; ++i) {
                         m_memory[m_index + i] = m_register[i];
                 }
+                m_index = m_index + x + 1;
+                m_index = (uint16_t) m_index;
 
                 break;
                 
                 case 0x0065 :
                     for (int i = 0; i <= x; ++i) {
                         m_register[i] = m_memory[m_index + i];
-                
                 }   
+                m_index = m_index + x + 1;
+                m_index = (uint16_t) m_index;
+
                 break;
                 
             } break;
