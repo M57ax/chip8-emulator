@@ -37,9 +37,9 @@ int main()
     constexpr int screenScale = 15;
     sf::RenderWindow window(sf::VideoMode({Chip8::screenWidth * screenScale , Chip8::screenHeight * screenScale}), "Chip-8 Emulator");
     Chip8 chip8;
-    chip8.loadROM("quirks.ch8");
+    chip8.loadROM("snek.ch8");
     window.setFramerateLimit(60);
-
+    
     
  
     while (window.isOpen())
@@ -53,11 +53,15 @@ int main()
         }
         for (int i = 0; i < 12; i++) {
             chip8.cycle();
+
+            if (chip8.isDrawingInstruction()){
+            break;
+            }
         }
-        
+       
         chip8.delayTimer();
         
-        window.clear();
+        window.clear(sf::Color(168,122,50));
         drawDisplay(window, chip8, screenScale);
         window.display();
     }

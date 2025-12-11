@@ -34,6 +34,7 @@ class Chip8{
         void loadROM(const std::string& filePath);
         void delayTimer();
         const std::array<uint8_t, screenWidth*screenHeight>& video() const { return m_display; }
+        bool isDrawingInstruction();
 
         static constexpr std::array<sf::Keyboard::Scancode, 16> keymap {
     sf::Keyboard::Scancode::X, sf::Keyboard::Scancode::Num1, sf::Keyboard::Scancode::Num2, sf::Keyboard::Scancode::Num3, sf::Keyboard::Scancode::Q,

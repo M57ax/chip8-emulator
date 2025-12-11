@@ -323,9 +323,13 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     }
 }
 
+bool Chip8::isDrawingInstruction() {
+    return (m_opcode & 0xF000) == 0xD000;
+}
+
 void Chip8::delayTimer() {
     if (m_delayTimer > 0) {
-        m_delayTimer--;
+        m_delayTimer -=1;
     }
 }
 
