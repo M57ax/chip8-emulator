@@ -321,8 +321,11 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     break;
     
     }
+}
+
+void Chip8::delayTimer() {
     if (m_delayTimer > 0) {
-        --m_delayTimer;
+        m_delayTimer--;
     }
 }
 
@@ -355,8 +358,8 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
             //Ich muss jetzt das linkeste Bit bzw Pixel holen
             // verschiebung der pixel im Sprite
             if (spriteByte & (0x80 >> bit)) { //binär 1000 0000
-                int px = (xPos + bit); //jetzt für jeden Pixel die Position berechen
-                int py = (yPos + row);
+                int px = (xPos + bit) % 64; //jetzt für jeden Pixel die Position berechen
+                int py = (yPos + row) % 32;
                 if (px <0 || px >= screenWidth || py <0 || py >= screenHeight) {
                     continue;
                 }
@@ -367,7 +370,7 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
                 if (m_display[index] == 1) { //ist der pixel schon 1 ?
                     m_register[0xF] = 1; // dann flag register auf 1
                 }
-                m_display[index] = m_display[index] ^ 1;
+                m_display[index] ^= 1;
                 //1 XOR 1 = 0 → Pixel wird gelöscht
                 //0 XOR 1 = 1 → Pixel wird gesetzt
             }

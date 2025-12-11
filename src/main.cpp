@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "chip8.hpp"
+#include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <array>
@@ -10,8 +11,6 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
-#include <iostream>
-#include <unordered_map>
 
 void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
 {
@@ -33,15 +32,12 @@ void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
     }
 }
 
-
-
-
 int main()
 {
     constexpr int screenScale = 15;
     sf::RenderWindow window(sf::VideoMode({Chip8::screenWidth * screenScale , Chip8::screenHeight * screenScale}), "Chip-8 Emulator");
     Chip8 chip8;
-    chip8.loadROM("keypad.ch8");
+    chip8.loadROM("quirks.ch8");
     window.setFramerateLimit(60);
 
     
@@ -53,31 +49,13 @@ int main()
             if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
-
-            // if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
-            //     for (int i = 0; i < 16; i++) {
-            //         if (Chip8::keymap[i] == key->scancode) {
-            //             chip8.setKey(i, true);
-            //         }
-            //     }
-            // }
-
-            // if (const auto* key = event->getIf<sf::Event::KeyReleased>()) {
-            //     for (int j = 0; j < 16; j++) {
-            //         if (Chip8::keymap[j] == key->scancode) {
-            //             chip8.setKey(j, false);s
-            //         }
-            //     }
-            // }
         
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 12; i++) {
             chip8.cycle();
         }
         
-        
-
-       
+        chip8.delayTimer();
         
         window.clear();
         drawDisplay(window, chip8, screenScale);

@@ -32,6 +32,7 @@ class Chip8{
         void drawSprite(uint8_t xPos, uint8_t yPos, int height);
         void cleanScreen();
         void loadROM(const std::string& filePath);
+        void delayTimer();
         const std::array<uint8_t, screenWidth*screenHeight>& video() const { return m_display; }
 
         static constexpr std::array<sf::Keyboard::Scancode, 16> keymap {
