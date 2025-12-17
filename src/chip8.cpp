@@ -7,6 +7,7 @@
 #include "font.hpp"
 #include <SFML/Window/Keyboard.hpp>
 
+
 Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
 
     //m_index = 0;
@@ -46,19 +47,29 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
     //uint16_t sum = m_register[x] + m_register[y];
     
     switch (m_opcode & 0xF000) {
-        case 0x0000 :
-            
-          if (m_opcode == 0x00E0) {
-           // std::cout << "clear screen..." << std::endl;
-            cleanScreen();
-            
-           }  else if (m_opcode == 0x00EE) {
-            //std::cout << "00EE" << std::endl;
-            --m_sp;
-            m_pc = m_stack[m_sp];
-            
-          } 
-          break;
+        case 0x0000:
+            switch (m_opcode) {
+            case 0x00E0: 
+                cleanScreen(); 
+                break;
+            case 0x00EE: 
+                --m_sp; m_pc = m_stack[m_sp]; 
+                break;
+            case 0x00FE: 
+                setHighRes(false);
+                highres = false; cleanScreen();
+                std::cout << "Low" << std::endl; 
+                break;
+            case 0x00FF:
+                setHighRes(true);
+                highres = true;  cleanScreen(); 
+                std::cout << "High" << std::endl;
+                break;
+            case 0x00FD:
+                std::cout << "Programm Stop" << std::endl;
+        break;
+    }
+    break;
 
         case 0x2000: //2nnn
             //std::cout << "2nnn" << std::endl;
@@ -229,12 +240,15 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
             m_register[x] = dist(generate) & nn;
             break;
         }
-        case 0xD000 : 
-          //  std::cout << "Zeichnet?" << std::endl;
-            drawSprite(m_register[x], m_register[y], n);
-            //zeichnet n poxel and position Vx / Vy
-            //(m_register[x], m_register[y], n); 
-            break;
+       case 0xD000:
+            if (n == 0 && highres) {
+                std::cout << "Highres??" << std::endl;
+                drawSprite(m_register[x], m_register[y], n);  
+            } else {
+                std::cout << "lowres" << std::endl;
+                drawSprite(m_register[x], m_register[y], n);  
+        }
+        break;
 
         case 0xE000 : 
             switch (m_opcode & 0x00FF) {
@@ -295,9 +309,9 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 }
                 break;
                 case 0x0055 : 
-                    for (int i = 0; i <= x; ++i) {
+                    for (int i = 0; i <= x; ++i) {  
                         m_memory[m_index + i] = m_register[i];
-                }
+                    }
                 m_index = m_index + x + 1;
                 m_index = (uint16_t) m_index;
 
@@ -346,39 +360,97 @@ void Chip8::cleanScreen() {
     m_display.fill(0);
 }
 
+//    erklärung der drawsprite funktion
+//     am anfang werden die startbit mit xpos und ypos begrentzt.
+//     - das 0xF register wird für die Kollisionen auf 0 gesetzt.
+//     - dann kommt der if pfad mit der prüfung ob das bit gleich 0 ist und highres true;
+//     - wenn das der fall ist wird der highres pfad genutzt. 
+//     - in der äußeren for schleife gehe ich durch die zeilen, da highres sind es 16.
+//     - da es im schip 16 bit sind, muss es hier zwei mal das spriteByte geben, das linke und das rechte 1 ist von 0 bis 7 und spriteByte2 von 8 bis 15
+//     - +1 , da es immer zwei sind ? 
+//     jetzt müssen wir schauen ob das bit an oder aus ist. quasi 0 oder 1, dafür prüfen wir zuerst ob es im ersten byte ist oder im zweiten, wenn das false, wird einer weitergemacht
+//     jetzt wird für jeden pixel die position berechnet.
+//     dann das array vom 2d in ein 1d mit der formel umberechnen 
+
+
 void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
-    xPos = xPos % screenWidth; //so nur für Startbit
-    yPos = yPos % screenHeight;
-    //VF register auf 0 setzten
+    xPos = xPos % screenWidth(); //so nur für Startbit
+    yPos = yPos % screenHeight();
     m_register[0xF] = 0; //Wegen Kollision
-    //Ein Sprite ist immer 8 Pixel/Bit breit aber die Höhe variiert, deswegen hier < height
-    // deshalb hier schleife über die Zeilen(also höhe)
-    for (int row = 0; row < height; row++) {
-        //Jedes Zeile des Sprites ist 8 Bit also 1 Byte 
-        uint8_t spriteByte = m_memory[m_index + row]; //indexregister
-        //row = 0 → m_memory[m_index + 0] → 1. Sprite-Zeile, dann row++
-        //row = 1 → m_memory[m_index + 1] → 2. Sprite-Zeile
-        // für jede der 8 Bit spalten in dem Byte
-        for (int bit = 0; bit < 8; bit++) {
-            //Ich muss jetzt das linkeste Bit bzw Pixel holen
-            // verschiebung der pixel im Sprite
-            if (spriteByte & (0x80 >> bit)) { //binär 1000 0000
+
+   
+    if (height == 0 && highres) {
+        for (int row = 0; row < 16; row++) {
+            
+            //jeder zeile hat 16 bits also 2 bytes
+            uint8_t spriteByte1 = m_memory[m_index + row * 2]; // 0-7 *2 um den Start jeweils zu verschieben
+            uint8_t spriteByte2 = m_memory[m_index + row +1]; // 8 -15
+            // +1 weil jede Zeile aus 2 aufeinanderf. Bytes besteht 
+            for (int bit = 0; bit < 16; bit++) {
+                bool pixelOn = false;
+                if (bit < 8) {
+                     pixelOn = (spriteByte1 & (0x80 >> bit)); // != 0 dann true;
+                    //bit isolierung
+                } else {
+                   pixelOn = (spriteByte2 & (0x80 >> (bit -8 )));
+                } 
+                
+                if (!pixelOn) {
+                    continue;
+                }
+               
                 int px = (xPos + bit); //jetzt für jeden Pixel die Position berechen
-                int py = (yPos + row); //mit Modulo den Wrap nach links und rechts richtig machen
-                if (px >= screenWidth || py >= screenHeight) {
+                int py = (yPos + row); 
+
+                if (px >= screenWidth() || py >= screenHeight()) {
                     continue;
                 }
                 // umwandlung meines 2d arrays in ein 1d index mit dieser Formel: 
-                int index = py * screenWidth + px ;
+                int index = py * screenWidth() + px ;
                 //kollision testen, wenn auf ein Pixel gezeichnet wird was 1 war, soll 0 werden
                 //und anders herum 0 zu 1, das ganze dann mit XOR
                 if (m_display[index] == 1) { //ist der pixel schon 1 ?
                     m_register[0xF] = 1; // dann flag register auf 1
                 }
                 m_display[index] ^= 1;
-                //1 XOR 1 = 0 → Pixel wird gelöscht
-                //0 XOR 1 = 1 → Pixel wird gesetzt
             }
         }
+        return;
     }
+
+    //Ein Sprite ist immer 8 Pixel/Bit breit aber die Höhe variiert, deswegen hier < height
+    // deshalb hier schleife über die Zeilen(also höhe)
+    for (int row = 0; row < height; row++) {
+        //Jedes Zeile des Sprites ist 8 Bit also 1 Byte 
+        uint8_t spriteByte = m_memory[m_index + row]; //indexregister
+        //row = 0 → m_memory[m_index + 0] -> 1. Sprite-Zeile, dann row++
+        //row = 1 → m_memory[m_index + 1] -> 2. Sprite-Zeile
+        // für jede der 8 Bit spalten in dem Byte
+        // 8 Pixel pro zeile
+        for (int bit = 0; bit < 8; bit++) {
+            //Ich muss jetzt das linkeste Bit bzw Pixel holen
+            // verschiebung der pixel im Sprite
+            bool pixelOn = false;
+            pixelOn  = (spriteByte & (0x80 >> bit));
+            if (!pixelOn) { 
+                continue;
+            };  //binär 1000 0000
+            int px = (xPos + bit); //jetzt für jeden Pixel die Position berechen
+            int py = (yPos + row); //mit Modulo den Wrap nach links und rechts richtig machen
+            if (px >= screenWidth() || py >= screenHeight()) {
+                continue;
+            }
+            // umwandlung meines 2d arrays in ein 1d index mit dieser Formel: 
+            int index = py * screenWidth() + px ;
+            //kollision testen, wenn auf ein Pixel gezeichnet wird was 1 war, soll 0 werden
+            //und anders herum 0 zu 1, das ganze dann mit XOR
+            if (m_display[index] == 1) { //ist der pixel schon 1 ?
+                m_register[0xF] = 1; // dann flag register auf 1
+            }
+            m_display[index] ^= 1;
+            //1 XOR 1 = 0 → Pixel wird gelöscht
+            //0 XOR 1 = 1 → Pixel wird gesetzt
+        }
+    }
+    
 }

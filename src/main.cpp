@@ -14,16 +14,17 @@
 
 void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
 {
-    sf::RectangleShape pixel({scale, scale}); //den cast muss ich wegen sfml machen oder?
+    sf::RectangleShape pixel({scale, scale}); 
     pixel.setFillColor(sf::Color::Yellow);
-    //Display(64x32) von Chip8 holen
+    
     const auto& display = chip8.video();
-    //disply holt das interne chip8 bild(aktueller zustand) = 
-    // brücke zw. chip8 u. sfml
-    for ( int y = 0; y < Chip8::screenHeight; y++) {
-        for (int x = 0; x < Chip8::screenWidth; x++ ) {
-            int index = y * Chip8::screenWidth + x;
-            //wenn pixel "an", dann draw
+    const int width = chip8.screenWidth();
+    const int height = chip8.screenHeight();
+    
+    for ( int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++ ) {
+            int index = y * width + x;
+            
             if (display[index] != 0U) {
                 pixel.setPosition({(float)x * (float)scale, (float)y * (float)scale});
                 window.draw(pixel);
@@ -34,10 +35,10 @@ void drawDisplay(sf::RenderWindow& window, const Chip8& chip8, float scale)
 
 int main()
 {
-    constexpr int screenScale = 15;
-    sf::RenderWindow window(sf::VideoMode({Chip8::screenWidth * screenScale , Chip8::screenHeight * screenScale}), "Chip-8 Emulator");
+    constexpr int screenScale = 10;
     Chip8 chip8;
-    chip8.loadROM("snek.ch8");
+    sf::RenderWindow window(sf::VideoMode({(128 * screenScale) ,(64 * screenScale)}), "Chip-8 Emulator");
+    chip8.loadROM("sw.ch8");
     window.setFramerateLimit(60);
     
     
@@ -55,7 +56,7 @@ int main()
             chip8.cycle();
 
             if (chip8.isDrawingInstruction()){
-            break;
+                break;
             }
         }
        
