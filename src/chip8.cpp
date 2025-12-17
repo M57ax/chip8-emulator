@@ -57,12 +57,12 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 break;
             case 0x00FE: 
                 setHighRes(false);
-                highres = false; cleanScreen();
+                //highres = false; cleanScreen();
                 std::cout << "Low" << std::endl; 
                 break;
             case 0x00FF:
                 setHighRes(true);
-                highres = true;  cleanScreen(); 
+                //highres = true;  cleanScreen(); 
                 std::cout << "High" << std::endl;
                 break;
             case 0x00FD:
@@ -383,8 +383,8 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
         for (int row = 0; row < 16; row++) {
             
             //jeder zeile hat 16 bits also 2 bytes
-            uint8_t spriteByte1 = m_memory[m_index + row * 2]; // 0-7 *2 um den Start jeweils zu verschieben
-            uint8_t spriteByte2 = m_memory[m_index + row +1]; // 8 -15
+            uint8_t spriteByte1 = m_memory[m_index + row ]; // 0-7 *2 um den Start jeweils zu verschieben
+            uint8_t spriteByte2 = m_memory[m_index + row  +1]; // 8 -15
             // +1 weil jede Zeile aus 2 aufeinanderf. Bytes besteht 
             for (int bit = 0; bit < 16; bit++) {
                 bool pixelOn = false;
