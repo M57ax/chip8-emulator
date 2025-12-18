@@ -38,11 +38,9 @@ int main()
     constexpr int screenScale = 10;
     Chip8 chip8;
     sf::RenderWindow window(sf::VideoMode({(128 * screenScale) ,(64 * screenScale)}), "Chip-8 Emulator");
-    chip8.loadROM("sw.ch8");
+    chip8.loadROM("gradsim.ch8");
     window.setFramerateLimit(60);
-    
-    
- 
+
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())

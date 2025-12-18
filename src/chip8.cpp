@@ -11,11 +11,6 @@
 
 
 Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
-
-    //m_index = 0;
-    //m_pc = 0x200;
-    // m_delayTimer = 0;
-    // m_soundTimer = 0;
     for (std::size_t i = 0; i < fontset.size(); ++i) {
         m_memory[FONTSET_START_ADDRESS + i] = fontset[i];
     }
@@ -38,10 +33,7 @@ void Chip8::loadROM(const std::string& filePath) {
 
     }
 }
-void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High und Low Byte werden kombiniert
-    //High und Low werden zu einem opcode, der wird ausgeführt und der pc um 2 hochgezählt
-    // danach werden die nächsten zwei Speicherblöcke zu einem Opcode usw.
-    //std::cout << "Test" << std::endl;
+void Chip8::cycle() { 
     m_opcode = (static_cast<uint16_t>(m_memory[m_pc]) << 8) |
            static_cast<uint16_t>(m_memory[m_pc + 1]);
 

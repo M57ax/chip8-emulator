@@ -21,11 +21,8 @@ class Chip8{
         void setHighRes(bool on) {highres = on; }
         void setSchip(bool on) {superChip = on;}
 
-        //const std::array<uint8_t, screenWidth*screenHeight>& video() const { return m_display; }
-        
     private:
-        // hatte davor char(war blöd, ich weiß) und das kann sehr leicht vom compiler 
-        // als signed behandelt werden
+      
         std::array<std::uint8_t, 4096> m_memory = {};
         std::array<std::uint8_t, 16> m_register = {};
         std::uint16_t m_index{};
