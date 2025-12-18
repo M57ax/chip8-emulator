@@ -1,6 +1,7 @@
 #include "chip8.hpp"
 #include <cstdint>
 
+#include <cstddef>
 #include <iostream>
 #include <fstream>
 #include <random>
@@ -15,6 +16,13 @@ Chip8::Chip8() :m_index(0), m_pc(0x200), m_sp(0), m_stack() {
     //m_pc = 0x200;
     // m_delayTimer = 0;
     // m_soundTimer = 0;
+    for (std::size_t i = 0; i < fontset.size(); ++i) {
+        m_memory[FONTSET_START_ADDRESS + i] = fontset[i];
+    }
+
+     for (std::size_t i = 0; i < schipset.size(); ++i) {
+        m_memory[SCHIPSET_START_ADDRESS + i] = schipset[i];
+    }
 }
 
 void Chip8::loadROM(const std::string& filePath) {
@@ -276,6 +284,15 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 case 0x001E : 
                     m_index += m_register[x];
                     break;
+
+                case 0x0029:
+                    m_index = 
+                        FONTSET_START_ADDRESS + (m_register[x] * 5u);
+                    break;
+
+                case 0x0030:
+                    m_index = SCHIPSET_START_ADDRESS + (m_register[x] * 10u);
+                    break;
                 case 0x0033 :
                 {
                     uint8_t value = m_register[x];
@@ -364,7 +381,7 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
     yPos = yPos % screenHeight();
     m_register[0xF] = 0; //Wegen Kollision
 
-    if (height == 0 && highres) {
+    if (height == 0) {
         for (int row = 0; row < 16; row++) {
             uint8_t spriteByte1 = m_memory[m_index + row *2]; // 0-7 *2 um den Start jeweils zu verschieben
             uint8_t spriteByte2 = m_memory[m_index + row *2 +1]; // 8 -15
