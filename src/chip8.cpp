@@ -57,11 +57,13 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 break;
             case 0x00FE: 
                 setHighRes(false);
+                setSchip(true);
                 //highres = false; cleanScreen();
                 std::cout << "Low" << std::endl; 
                 break;
             case 0x00FF:
                 setHighRes(true);
+                setSchip(true);
                 //highres = true;  cleanScreen(); 
                 std::cout << "High" << std::endl;
                 break;
@@ -181,27 +183,33 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                 break;
             }
                 case 0x0006: {
-                // LEtzte Bit von VW wird gespeichert, schiebt VX um 1 nach rechts 1 wenn ungerade war, 0 wenn es gerade war
+                // LEtzte Bit von Vx wird gespeichert, schiebt VX um 1 nach rechts 1 wenn ungerade war, 0 wenn es gerade war
                     //std::cout << "8XY6" << std::endl;
                     uint8_t vx = m_register[x];
                     uint8_t vy = m_register[y];
+                    if (superChip) {
+                        m_register[0xF] = m_register[x] & 0x1u;
+                        m_register[x] >>= 1;
+                    } else { 
                     vx = vy;
                     m_register[0xF] = (vx & 0x1u);
                     m_register[x] = ( vx >>1);
-                    
-                    break;
+                    }     
+                break;
                 }
                 case 0x000E: {
                     uint8_t vx = m_register[x];
                     uint8_t vy = m_register[y];
+                    if (superChip) {
+                        m_register[0xF] =  (m_register[x] & 0x80u) >> 7u;
+                        m_register[x] <<= 1;
+                    } else {
                     vx = vy;
                     //std::cout << "8XYE" << std::endl;
                     m_register[0xF] = (vx & 0x80u) >> 7u;
                     m_register[x] = (vx <<1);
                     //ich hatte davor das ale vVx genommen (also das ohne vx = vy)
-                    
-                    
-                    
+                    }
                     break;
                 }
                 case 0x0007: {
@@ -213,11 +221,10 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
                         m_register[0xF] = 1;
                     } else {
                         m_register[0xF] = 0;
-                    }
-                    
-                    
+                    } 
                 break;
                 }
+                
        }
        break;
         }  
@@ -242,6 +249,7 @@ void Chip8::cycle() { // m_memory[m_pc] ist der Start also ab Memory 512 High un
         }
        case 0xD000:
             if (n == 0 && highres) {
+                setSchip(true);
                 std::cout << "Highres??" << std::endl;
                 drawSprite(m_register[x], m_register[y], n);  
             } else {
@@ -360,18 +368,6 @@ void Chip8::cleanScreen() {
     m_display.fill(0);
 }
 
-//    erklärung der drawsprite funktion
-//     am anfang werden die startbit mit xpos und ypos begrentzt.
-//     - das 0xF register wird für die Kollisionen auf 0 gesetzt.
-//     - dann kommt der if pfad mit der prüfung ob das bit gleich 0 ist und highres true;
-//     - wenn das der fall ist wird der highres pfad genutzt. 
-//     - in der äußeren for schleife gehe ich durch die zeilen, da highres sind es 16.
-//     - da es im schip 16 bit sind, muss es hier zwei mal das spriteByte geben, das linke und das rechte 1 ist von 0 bis 7 und spriteByte2 von 8 bis 15
-//     - +1 , da es immer zwei sind ? 
-//     jetzt müssen wir schauen ob das bit an oder aus ist. quasi 0 oder 1, dafür prüfen wir zuerst ob es im ersten byte ist oder im zweiten, wenn das false, wird einer weitergemacht
-//     jetzt wird für jeden pixel die position berechnet.
-//     dann das array vom 2d in ein 1d mit der formel umberechnen 
-
 
 void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
     xPos = xPos % screenWidth(); //so nur für Startbit
@@ -383,8 +379,8 @@ void Chip8::drawSprite(uint8_t xPos, uint8_t yPos, int height) {
         for (int row = 0; row < 16; row++) {
             
             //jeder zeile hat 16 bits also 2 bytes
-            uint8_t spriteByte1 = m_memory[m_index + row ]; // 0-7 *2 um den Start jeweils zu verschieben
-            uint8_t spriteByte2 = m_memory[m_index + row  +1]; // 8 -15
+            uint8_t spriteByte1 = m_memory[m_index + row *2]; // 0-7 *2 um den Start jeweils zu verschieben
+            uint8_t spriteByte2 = m_memory[m_index + row *2 +1]; // 8 -15
             // +1 weil jede Zeile aus 2 aufeinanderf. Bytes besteht 
             for (int bit = 0; bit < 16; bit++) {
                 bool pixelOn = false;

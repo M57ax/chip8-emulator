@@ -18,7 +18,8 @@ class Chip8{
 
         const  std::array<uint8_t, highResWidth * highResHeight> & video() const {return m_display;}
 
-        void setHighRes(bool on) {highres = on, cleanScreen(); }
+        void setHighRes(bool on) {highres = on; }
+        void setSchip(bool on) {superChip = on;}
 
         //const std::array<uint8_t, screenWidth*screenHeight>& video() const { return m_display; }
 
@@ -39,6 +40,7 @@ class Chip8{
         std::array<uint8_t, highResHeight * highResWidth> m_display = {};  
         std::array<bool, 16> m_keypad{};
         bool highres = false;
+        bool superChip = false;
        
     public:
         
