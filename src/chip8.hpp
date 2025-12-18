@@ -22,8 +22,7 @@ class Chip8{
         void setSchip(bool on) {superChip = on;}
 
         //const std::array<uint8_t, screenWidth*screenHeight>& video() const { return m_display; }
-
-
+        
     private:
         // hatte davor char(war blöd, ich weiß) und das kann sehr leicht vom compiler 
         // als signed behandelt werden
@@ -59,8 +58,5 @@ class Chip8{
      sf::Keyboard::Scancode::W, sf::Keyboard::Scancode::E, sf::Keyboard::Scancode::A, sf::Keyboard::Scancode::S, sf::Keyboard::Scancode::D, sf::Keyboard::Scancode::Z, 
      sf::Keyboard::Scancode::C, sf::Keyboard::Scancode::Num4, sf::Keyboard::Scancode::R, sf::Keyboard::Scancode::F, sf::Keyboard::Scancode::V,
 };
-
-
-
     Chip8();
 };
