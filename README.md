@@ -20,7 +20,7 @@ GPU(SFML) = drawDisplay()
 
 
 cd existing_repo
-git remote add origin http://SRV-SWE-GIT.atoma.local/schelske/chip-8.git
+git remote add origin ...
 git branch -M master
 git push -uf origin master
 
@@ -35,5 +35,3 @@ git push -uf origin master
 
 Use the built-in continuous integration in GitLab.
 
-
-***
